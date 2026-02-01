@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alexander & Isabella | June 15, 2026</title>
+    <meta name="description" content="Alexander & Isabella are getting married on June 15, 2026. Join us for our special day.">
+    
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for premium animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lenis smooth scroll -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        champagne: '#F5E6D3',
+                        'champagne-dark': '#E8D5C4',
+                        sage: '#9CAF88',
+                        'sage-dark': '#7A8F6A',
+                        cream: '#FAF8F5',
+                        charcoal: '#2C2C2C',
+                        'warm-gray': '#6B6B6B',
+                        blush: '#E8D5D0',
+                    },
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Cursor */
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: #2C2C2C;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.15s ease;
+        }
+        
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(44, 44, 44, 0.3);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.2s ease;
+        }
+        
+        .cursor-hover .cursor-dot {
+            transform: scale(2);
+        }
+        
+        .cursor-hover .cursor-outline {
+            transform: scale(1.5);
+            border-color: rgba(44, 44, 44, 0.5);
+        }
+        
+        /* Noise Texture Overlay */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9990;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #FAF8F5;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: #2C2C2C;
+            letter-spacing: 0.3em;
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-progress {
+            width: 200px;
+            height: 1px;
+            background: rgba(44, 44, 44, 0.1);
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loading-progress-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: #2C2C2C;
+            animation: loadingProgress 2s ease-out forwards;
+        }
+        
+        @keyframes loadingProgress {
+            to { width: 100%; }
+        }
+        
+        /* Hero Parallax */
+        .hero-image {
+            will-change: transform;
+        }
+        
+        /* Scroll Reveal Base */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        
+        /* Navigation */
+        .nav-hidden {
+            transform: translateY(-100%);
+        }
+        
+        .nav-visible {
+            transform: translateY(0);
+        }
+        
+        /* Button Hover Effect */
+        .btn-luxury {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .btn-luxury::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-luxury:hover::before {
+            left: 100%;
+        }
+        
+        /* Image Hover Zoom */
+        .img-zoom {
+            overflow: hidden;
+        }
+        
+        .img-zoom img {
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .img-zoom:hover img {
+            transform: scale(1.08);
+        }
+        
+        /* Gallery Masonry */
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Form Styling */
+        .luxury-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(44, 44, 44, 0.2);
+            padding: 1rem 0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .luxury-input:focus {
+            outline: none;
+            border-bottom-color: #2C2C2C;
+        }
+        
+        .luxury-input::placeholder {
+            color: rgba(44, 44, 44, 0.4);
+        }
+        
+        /* Timeline Line */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(44, 44, 44, 0.2), transparent);
+        }
+        
+        /* Decorative Elements */
+        .floral-accent {
+            position: absolute;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Hide scrollbar for smooth scroll */
+        html.lenis {
+            height: auto;
+        }
+        
+        .lenis.lenis-smooth {
+            scroll-behavior: auto;
+        }
+        
+        /* RSVP Radio Buttons */
+        .radio-luxury {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(44, 44, 44, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-luxury:checked {
+            background: #2C2C2C;
+            border-color: #2C2C2C;
+        }
+        
+        /* Gift Card Hover */
+        .gift-card {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .gift-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-cream text-charcoal font-sans antialiased selection:bg-sage selection:text-white">
+    
+    <!-- Noise Texture Overlay -->
+    <div class="noise-overlay"></div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot hidden md:block" id="cursorDot"></div>
+    <div class="cursor-outline hidden md:block" id="cursorOutline"></div>
+    
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 nav-hidden">
+        <div class="backdrop-blur-md bg-cream/80 border-b border-charcoal/5">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div class="flex items-center justify-between h-20">
+                    <!-- Logo -->
+                    <a href="#hero" class="font-serif text-2xl tracking-wider text-charcoal hover-target">
+                        A <span class="text-sage">&</span> I
+                    </a>
+                    
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center space-x-10">
+                        <a href="#story" class="text-sm tracking-widest uppercase text-warm-gray hover:text-charcoal transition-colors hover-target">Our Story</a>
+                        <a href="#details" class="text-sm tracking-widest uppercase text-warm-gray hover:text-charcoal transition-colors hover-target">Details</a>
+                        <a href="#gallery" class="text-sm tracking-widest uppercase text-warm-gray hover:text-charcoal transition-colors hover-target">Gallery</a>
+                        <a href="#rsvp" class="text-sm tracking-widest uppercase text-warm-gray hover:text-charcoal transition-colors hover-target">RSVP</a>
+                        <a href="#gifts" class="text-sm tracking-widest uppercase text-warm-gray hover:text-charcoal transition-colors hover-target">Gifts</a>
+                    </div>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="menuBtn" class="md:hidden hover-target">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-0 z-50 bg-cream">
+        <div class="flex flex-col h-full p-8">
+            <div class="flex justify-between items-center mb-16">
+                <span class="font-serif text-2xl tracking-wider">A & I</span>
+                <button id="closeMenuBtn">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-8">
+                <a href="#story" class="mobile-nav-link font-serif text-4xl text-charcoal">Our Story</a>
+                <a href="#details" class="mobile-nav-link font-serif text-4xl text-charcoal">Details</a>
+                <a href="#gallery" class="mobile-nav-link font-serif text-4xl text-charcoal">Gallery</a>
+                <a href="#rsvp" class="mobile-nav-link font-serif text-4xl text-charcoal">RSVP</a>
+                <a href="#gifts" class="mobile-nav-link font-serif text-4xl text-charcoal">Gifts</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hero Section -->
+    <section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 hero-image">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80" 
+                 alt="Romantic wedding couple" 
+                 class="w-full h-full object-cover scale-110">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-cream"></div>
+        </div>
+        
+        <!-- Decorative Elements -->
+        <div class="absolute top-20 left-10 w-32 h-32 border border-white/20 rounded-full hidden lg:block"></div>
+        <div class="absolute bottom-40 right-20 w-48 h-48 border border-white/10 rounded-full hidden lg:block"></div>
+        
+        <!-- Content -->
+        <div class="relative z-10 text-center text-white px-6">
+            <p class="hero-subtitle text-sm md:text-base tracking-[0.4em] uppercase mb-6 opacity-0">We're Getting Married</p>
+            <h1 class="hero-title font-serif text-5xl md:text-7xl lg:text-9xl mb-8 opacity-0">
+                Alexander<br>
+                <span class="text-4xl md:text-6xl lg:text-8xl italic font-light">&</span><br>
+                Isabella
+            </h1>
+            <div class="hero-date flex items-center justify-center gap-6 mb-12 opacity-0">
+                <span class="h-px w-16 bg-white/50"></span>
+                <p class="text-lg md:text-xl tracking-widest">June 15, 2026</p>
+                <span class="h-px w-16 bg-white/50"></span>
+            </div>
+            <a href="#story" class="hero-cta btn-luxury inline-flex items-center gap-3 px-8 py-4 border border-white/40 text-white hover:bg-white hover:text-charcoal transition-all duration-500 opacity-0 hover-target">
+                <span class="text-sm tracking-widest uppercase">Our Story</span>
+                <i data-lucide="arrow-down" class="w-4 h-4"></i>
+            </a>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/60 animate-float">
+            <i data-lucide="chevron-down" class="w-6 h-6"></i>
+        </div>
+    </section>
+    
+    <!-- Our Story Section -->
+    <section id="story" class="py-24 md:py-32 bg-cream relative overflow-hidden">
+        <!-- Decorative -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-sage/5 rounded-full blur-3xl"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <!-- Section Header -->
+            <div class="text-center mb-20 reveal">
+                <h2 class="font-serif text-4xl md:text-6xl text-charcoal">Our Story</h2>
+            </div>
+            
+            <!-- Story Content -->
+            <div class="max-w-2xl mx-auto text-center reveal">
+                <p class="text-warm-gray leading-relaxed text-lg mb-6">
+                    It was a rainy Tuesday evening at a small bookstore in Brooklyn when our eyes first met across the poetry section. 
+                    Alexander reached for the same Rilke collection that Isabella had been admiring for ten minutes.
+                </p>
+                <p class="text-warm-gray leading-relaxed text-lg">
+                    What started as an apology and a shared coffee became hours of conversation about dreams, 
+                    art, and the peculiar beauty of found moments. We didn't know it then, but that rainy evening 
+                    would change everything.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Event Details Section -->
+    <section id="details" class="py-24 md:py-32 bg-white relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <!-- Section Header -->
+            <div class="text-center mb-20 reveal">
+                <p class="text-sage text-sm tracking-[0.3em] uppercase mb-4">Join Us</p>
+                <h2 class="font-serif text-4xl md:text-6xl text-charcoal">Wedding Details</h2>
+            </div>
+            
+            <!-- Date Banner -->
+            <div class="bg-champagne/30 rounded-sm p-8 md:p-12 mb-16 reveal">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+                    <div class="text-center">
+                        <span class="block text-5xl md:text-7xl font-serif text-charcoal">15</span>
+                        <span class="text-warm-gray tracking-widest uppercase">June</span>
+                    </div>
+                    <div class="hidden md:block w-px h-20 bg-charcoal/20"></div>
+                    <div class="text-center">
+                        <span class="block text-5xl md:text-7xl font-serif text-charcoal">2026</span>
+                        <span class="text-warm-gray tracking-widest uppercase">Monday</span>
+                    </div>
+                    <div class="hidden md:block w-px h-20 bg-charcoal/20"></div>
+                    <div class="text-center">
+                        <span class="block text-5xl md:text-7xl font-serif text-charcoal">4:00</span>
+                        <span class="text-warm-gray tracking-widest uppercase">In the Afternoon</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Cards -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Ceremony -->
+                <div class="group reveal">
+                    <div class="relative overflow-hidden rounded-sm">
+                        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80" 
+                             alt="Ceremony venue" 
+                             class="w-full aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                            <span class="text-sage text-sm tracking-widest uppercase">3:30 PM</span>
+                            <h3 class="font-serif text-3xl mt-2 mb-3">The Ceremony</h3>
+                            <p class="text-white/80 text-sm leading-relaxed">St. Patrick's Cathedral<br>5th Avenue, New York</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reception -->
+                <div class="group reveal">
+                    <div class="relative overflow-hidden rounded-sm">
+                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80" 
+                             alt="Reception venue" 
+                             class="w-full aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                            <span class="text-sage text-sm tracking-widest uppercase">6:00 PM</span>
+                            <h3 class="font-serif text-3xl mt-2 mb-3">The Reception</h3>
+                            <p class="text-white/80 text-sm leading-relaxed">The Plaza Hotel<br>Central Park South, New York</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Info Removed -->
+        </div>
+    </section>
+    
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 md:py-32 bg-cream">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <!-- Section Header -->
+            <div class="text-center mb-16 reveal">
+                <p class="text-sage text-sm tracking-[0.3em] uppercase mb-4">Moments</p>
+                <h2 class="font-serif text-4xl md:text-6xl text-charcoal">Gallery</h2>
+            </div>
+            
+            <!-- Gallery Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="gallery-item reveal">
+                    <div class="img-zoom rounded-sm overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=600&q=80" 
+                             alt="Engagement photo" 
+                             class="w-full aspect-square object-cover">
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <div class="img-zoom rounded-sm overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1529634806980-85c3dd6d34ac?w=600&q=80" 
+                             alt="Couple portrait" 
+                             class="w-full aspect-square object-cover">
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <div class="img-zoom rounded-sm overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=600&q=80" 
+                             alt="Wedding rings" 
+                             class="w-full aspect-square object-cover">
+                    </div>
+                </div>
+                <div class="gallery-item reveal">
+                    <div class="img-zoom rounded-sm overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80" 
+                             alt="Save the date" 
+                             class="w-full aspect-square object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="rsvp" class="py-16 md:py-24 bg-charcoal text-white relative overflow-hidden">
+        <div class="max-w-2xl mx-auto px-6 lg:px-12 text-center">
+            <p class="text-sage text-sm tracking-[0.3em] uppercase mb-4">Save the Date</p>
+            <h2 class="font-serif text-3xl md:text-5xl mb-6">Join Us</h2>
+            <p class="text-white/60 mb-8">Kindly reply by May 1, 2026</p>
+            <a href="mailto:wedding@example.com" class="inline-flex items-center gap-2 text-white border-b border-white/30 pb-1 hover:border-white transition-colors hover-target">
+                <span>RSVP via Email</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Digital Gifts Section -->
+    <section id="gifts" class="py-24 md:py-32 bg-cream">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <!-- Section Header -->
+            <div class="text-center mb-16 reveal">
+                <p class="text-sage text-sm tracking-[0.3em] uppercase mb-4">Gift Registry</p>
+                <h2 class="font-serif text-4xl md:text-6xl text-charcoal mb-6">Digital Gifts</h2>
+                <p class="text-warm-gray max-w-2xl mx-auto">Your presence is the greatest gift of all. For those who wish to contribute, we've curated a selection of experiences and items for our new life together.</p>
+            </div>
+            
+            <!-- QR Codes -->
+            <div class="grid md:grid-cols-2 gap-8 max-w-lg mx-auto">
+                <!-- Momo -->
+                <div class="bg-white p-6 rounded-sm text-center reveal">
+                    <div class="w-32 h-32 mx-auto mb-4 bg-gray-100 rounded-sm flex items-center justify-center">
+                        <span class="text-xs text-gray-400">QR Momo</span>
+                    </div>
+                    <p class="text-sm font-medium">Momo: 0987654321</p>
+                    <p class="text-xs text-warm-gray">Nguyen Van A</p>
+                </div>
+                <!-- Bank -->
+                <div class="bg-white p-6 rounded-sm text-center reveal">
+                    <div class="w-32 h-32 mx-auto mb-4 bg-gray-100 rounded-sm flex items-center justify-center">
+                        <span class="text-xs text-gray-400">QR Bank</span>
+                    </div>
+                    <p class="text-sm font-medium">Vietcombank</p>
+                    <p class="text-xs text-warm-gray">1234567890 - Tran Thi B</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-20 bg-charcoal text-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 text-center">
+            <h3 class="font-serif text-4xl md:text-5xl mb-6">Alexander & Isabella</h3>
+            <p class="text-white/60 mb-8">June 15, 2026 • New York City</p>
+            
+            <div class="flex justify-center gap-6 mb-12">
+                <a href="#" class="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-charcoal transition-all hover-target">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center hover:bg-white hover:text-charcoal transition-all hover-target">
+                    <i data-lucide="heart" class="w-5 h-5"></i>
+                </a>
+            </div>
+            
+            <div class="pt-8 border-t border-white/10">
+                <p class="text-white/40 text-sm">Made with love • 2026</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Modal removed -->
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        // ============================================
+        // INIT ANIMATIONS ON LOAD
+        // ============================================
+        window.addEventListener('load', () => {
+            initAnimations();
+        });
+        
+        // ============================================
+        // SMOOTH SCROLL (LENIS)
+        // ============================================
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            smoothWheel: true
+        });
+        
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+        
+        // Connect Lenis to GSAP ScrollTrigger
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+        
+        // ============================================
+        // CUSTOM CURSOR
+        // ============================================
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorOutline = document.getElementById('cursorOutline');
+        let mouseX = 0, mouseY = 0;
+        let outlineX = 0, outlineY = 0;
+        
+        // Check for touch device
+        const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+        
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursorDot.style.left = mouseX + 'px';
+                cursorDot.style.top = mouseY + 'px';
+            });
+            
+            // Smooth outline follow
+            function animateCursor() {
+                outlineX += (mouseX - outlineX) * 0.15;
+                outlineY += (mouseY - outlineY) * 0.15;
+                cursorOutline.style.left = outlineX + 'px';
+                cursorOutline.style.top = outlineY + 'px';
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+            
+            // Hover effects
+            document.querySelectorAll('.hover-target, a, button').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        }
+        
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = 0;
+        
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 100) {
+                if (currentScrollY < lastScrollY) {
+                    navbar.classList.remove('nav-hidden');
+                    navbar.classList.add('nav-visible');
+                } else {
+                    navbar.classList.add('nav-hidden');
+                    navbar.classList.remove('nav-visible');
+                }
+            } else {
+                navbar.classList.add('nav-hidden');
+                navbar.classList.remove('nav-visible');
+            }
+            
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+        
+        // Mobile Menu
+        const menuBtn = document.getElementById('menuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        
+        menuBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+        closeMenuBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    lenis.scrollTo(target, { offset: -80 });
+                }
+            });
+        });
+        
+        // ============================================
+        // GSAP ANIMATIONS
+        // ============================================
+        function initAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Hero Animations
+            const heroTl = gsap.timeline();
+            heroTl.to('.hero-subtitle', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' })
+                  .to('.hero-title', { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }, '-=0.6')
+                  .to('.hero-date', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.6')
+                  .to('.hero-cta', { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.6');
+            
+            // Hero Parallax
+            gsap.to('.hero-image', {
+                yPercent: 30,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '#hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+            
+            // Scroll Reveal Animations
+            const revealElements = document.querySelectorAll('.reveal');
+            revealElements.forEach((el, i) => {
+                gsap.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            });
+            
+            // Gallery Stagger
+            gsap.from('.gallery-item', {
+                opacity: 0,
+                y: 40,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: '#gallery',
+                    start: 'top 70%'
+                }
+            });
+            
+            // Gift Cards Stagger
+            gsap.from('.gift-card', {
+                opacity: 0,
+                y: 30,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: '#gifts',
+                    start: 'top 70%'
+                }
+            });
+        }
+        
+        // RSVP form removed - using email link instead
+    </script>
+</body>
+</html>
